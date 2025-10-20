@@ -268,7 +268,7 @@ export default function HomeScreen() {
         style={{ width: SIDEBAR_W }}
       >
         <div className="p-6 h-full flex flex-col">
-          <h2 ref={sidebarTitleRef} className="text-2xl text-center tracking-wide opacity-0">
+          <h2 ref={sidebarTitleRef} className="text-2xl font-staatliches text-center tracking-wide opacity-0">
             Select a building to<br />explore through the years
           </h2>
 

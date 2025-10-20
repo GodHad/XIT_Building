@@ -273,14 +273,14 @@ export const tracks: BuildingTrack[] = [
   },
   {
     id: "Oxford_StFrancisHotel",
-    name: "Oxford, St. Francis Hotel",
+    name: "Oxford/St.Francis Hotel",
     mapRef: "/images/home/Dalhart_BaseMap.jpg",
     pins: [
       {
         id: "pin-1",
         x: 0.518324,
         y: 0.440771,
-        label: "Oxford_StFrancisHotel_1"
+        label: "Oxford/St.FrancisHotel_1"
       }
     ],
     slides: [
@@ -333,13 +333,13 @@ export const tracks: BuildingTrack[] = [
         id: "pin-1",
         x: 0.451513,
         y: 0.485040,
-        label: "HotelDalhart_1"
+        label: "Hotel Dalhart_1"
       },
       {
         id: "pin-2",
         x: 0.479214,
         y: 0.581457,
-        label: "HotelDalhart_2"
+        label: "Hotl Dalhart_2"
       }
     ],
     slides: [
@@ -393,7 +393,7 @@ export const tracks: BuildingTrack[] = [
         id: "pin-1",
         x: 0.483635,
         y: 0.532019,
-        label: "DeSotoHotel_1"
+        label: "DeSoto Hotel_1"
       }
     ],
     slides: [
@@ -482,51 +482,51 @@ export const tracks: BuildingTrack[] = [
         id: "pin-1",
         x: 0.489808,
         y: 0.568025,
-        label: "XITMuseum_1"
+        label: "XIT Museum_1"
       }
     ],
     slides: [
       {
         id: "XITMusuem_1",
         mediaType: "image",
-        src: "/images/building_content/XITMuseum/XITMusuem_1.jpg",
+        src: "/images/building_content/XITMusuem/XITMusuem_1.jpg",
         caption: "The XIT Museum building was constructed on the original site of the Dalhart Water Works on 5th street between Denver and Denrock. This image was taken about 1908. The water tower can be seen in the center of the picture.",
         locationPin: "pin-1"
       },
       {
         id: "XITMusuem_2",
         mediaType: "image",
-        src: "/images/building_content/XITMuseum/XITMusuem_2.jpg",
+        src: "/images/building_content/XITMusuem/XITMusuem_2.jpg",
         caption: "In May of 1929 Richard (Uncle Dick) Coon had constructed a 70\u2019 x 140\u2019 brick building for Oakland Pontiac Dealers."
       },
       {
         id: "XITMusuem_3",
         mediaType: "image",
-        src: "/images/building_content/XITMuseum/XITMusuem_3.jpg",
+        src: "/images/building_content/XITMusuem/XITMusuem_3.jpg",
         caption: "Over time several business\u2019s used the building including Chrysler King Motor Co. Plymouth. During WWII it was used as the USO for black soldiers."
       },
       {
         id: "XITMusuem_4",
         mediaType: "image",
-        src: "/images/building_content/XITMuseum/XITMusuem_4.jpg",
+        src: "/images/building_content/XITMusuem/XITMusuem_4.jpg",
         caption: "In 1975 H. Coon and the Coon Hospital Trust leased the building to the Dallam-Hartley Co. Historical Association for the purpose of housing the new XIT Museum. That year a brand wall was constructed which allowed ranchers and farmers to place their brands on the wall."
       },
       {
         id: "XITMusuem_5",
         mediaType: "image",
-        src: "/images/building_content/XITMuseum/XITMusuem_5.jpg",
+        src: "/images/building_content/XITMusuem/XITMusuem_5.jpg",
         caption: "Over the years many people have volunteered their time in making the museum a wonderful place to visit \u2013 such as Burton and Dessie Hanbury."
       },
       {
         id: "XITMusuem_6",
         mediaType: "image",
-        src: "/images/building_content/XITMuseum/XITMusuem_6.jpg",
+        src: "/images/building_content/XITMusuem/XITMusuem_6.jpg",
         caption: "The current building has weathered time well with only a few changes to its outside and doubling in size."
       },
       {
         id: "XITMusuem_7",
         mediaType: "image",
-        src: "/images/building_content/XITMuseum/XITMusuem_7.jpg",
+        src: "/images/building_content/XITMusuem/XITMusuem_7.jpg",
         caption: "Leather key chain with museum logo stamped on it."
       }
     ],
@@ -541,7 +541,7 @@ export const tracks: BuildingTrack[] = [
         id: "pin-1",
         x: 0.475057,
         y: 0.489783,
-        label: "MasonicLodge_1"
+        label: "Masonic Lodge_1"
       }
     ],
     slides: [
@@ -574,27 +574,27 @@ export const tracks: BuildingTrack[] = [
     startPinId: "pin-1"
   },
   {
-    id: "IcePlanBottlingWorks",
-    name: "Ice Plant/Bottling Works",
+    id: "IcePlanBottling",
+    name: "Ice Plant/Bottling",
     mapRef: "/images/home/Dalhart_BaseMap.jpg",
     pins: [
       {
         id: "pin-1",
         x: 0.364520,
         y: 0.450847,
-        label: "IcePlanBottlingWorks_1"
+        label: "Ice Plant/Bottling_1"
       },
       {
         id: "pin-2",
         x: 0.377275,
         y: 0.446806,
-        label: "IcePlanBottlingWorks_2"
+        label: "Ice Plant/Bottling_2"
       },
       {
         id: "pin-3",
         x: 0.374066,
         y: 0.432813,
-        label: "IcePlanBottlingWorks_3"
+        label: "Ice Plant/Bottling_3"
       }
     ],
     slides: [
@@ -779,25 +779,25 @@ export const tracks: BuildingTrack[] = [
         id: "pin-1",
         x: 0.449391,
         y: 0.419377,
-        label: "PostOffice_1"
+        label: "Post Office_1"
       },
       {
         id: "pin-2",
         x: 0.475009,
         y: 0.465473,
-        label: "PostOffice_2"
+        label: "Post Office_2"
       },
       {
         id: "pin-3",
         x: 0.521781,
         y: 0.482396,
-        label: "PostOffice_3"
+        label: "Post Office_3"
       },
       {
         id: "pin-4",
         x: 0.435742,
         y: 0.472782,
-        label: "PostOffice_3"
+        label: "Post Office_3"
       }
     ],
     slides: [
@@ -862,7 +862,7 @@ export const tracks: BuildingTrack[] = [
     startPinId: "pin-1"
   },
   {
-    id: "B&B_CozyCorner",
+    id: "BB_CozyCorner",
     name: "Cozy Corner/B&B Cafe",
     mapRef: "/images/home/Dalhart_BaseMap.jpg",
     pins: [
@@ -870,7 +870,7 @@ export const tracks: BuildingTrack[] = [
         id: "pin-1",
         x: 0.471571,
         y: 0.438884,
-        label: "B&B_CozyCorner_1"
+        label: "Cozy Corner/B&B Cafe_1"
       }
     ],
     slides: [
@@ -941,13 +941,13 @@ export const tracks: BuildingTrack[] = [
         id: "pin-1",
         x: 0.526957,
         y: 0.418939,
-        label: "RailroadDepot_1"
+        label: "Railroad Depot_1"
       },
       {
         id: "pin-2",
         x: 0.503112,
         y: 0.286693,
-        label: "RailroadDepot_2"
+        label: "Railroad Depot_2"
       }
     ],
     slides: [
@@ -1187,73 +1187,73 @@ export const tracks: BuildingTrack[] = [
         id: "pin-1",
         x: 0.423813,
         y: 0.268471,
-        label: "Church_1"
+        label: "Churches_1"
       },
       {
         id: "pin-2",
         x: 0.411483,
         y: 0.594749,
-        label: "Church_2"
+        label: "Churches_2"
       },
       {
         id: "pin-3",
         x: 0.408924,
         y: 0.625841,
-        label: "Church_3"
+        label: "Churches_3"
       },
       {
         id: "pin-4",
         x: 0.406314,
         y: 0.572286,
-        label: "Church_4"
+        label: "Churches_4"
       },
       {
         id: "pin-5",
         x: 0.449847,
         y: 0.611928,
-        label: "Church_5"
+        label: "Churches_5"
       },
       {
         id: "pin-6",
         x: 0.752242,
         y: 0.866616,
-        label: "Church_6"
+        label: "Churches_6"
       },
       {
         id: "pin-7",
         x: 0.548138,
         y: 0.512406,
-        label: "Church_7"
+        label: "Churches_7"
       },
       {
         id: "pin-8",
         x: 0.576233,
         y: 0.847057,
-        label: "Church_8"
+        label: "Churches_8"
       },
       {
         id: "pin-9",
         x: 0.524031,
         y: 0.652594,
-        label: "Church_9"
+        label: "Churches_9"
       },
       {
         id: "pin-10",
         x: 0.573626,
         y: 0.864218,
-        label: "Church_10"
+        label: "Churches_10"
       },
       {
         id: "pin-11",
         x: 0.515730,
         y: 0.609306,
-        label: "Church_11"
+        label: "Churches_11"
       },
       {
         id: "pin-12",
         x: 0.553323,
         y: 0.693349,
-        label: "Church_12"
+        label: "Churches_12"
       }
     ],
     slides: [
@@ -1383,7 +1383,7 @@ export const tracks: BuildingTrack[] = [
         id: "pin-1",
         x: 0.440359,
         y: 0.414383,
-        label: "WoodBuilding_1"
+        label: "Wood Building_1"
       }
     ],
     slides: [

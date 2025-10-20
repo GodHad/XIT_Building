@@ -5,7 +5,6 @@ import MapPin from "./MapPin";
 import EdgeArrows from "./EdgeArrows";  
 import { useSoundEffect } from "@/hooks/useSoundEffect";
 import { Pin } from "@/data/types";
-import { tracks } from '@/data/buildings';
 
 type Props = {
   mapSrc: string;
@@ -205,10 +204,6 @@ export default function MapCanvas({
             const pin = pins.find(p => p.id === tooltipFor);
             if (!pin) return null;
 
-            const buildingId = String(pin.id ?? tooltipFor).split(':')[0];
-            const buildingName =
-              tracks.find(t => t.id === buildingId)?.name ?? pin.label ?? 'Location';
-
             const pinImg = contentRef.current?.querySelector(
               `[data-pin-id="${tooltipFor}"] img`
             ) as HTMLElement | null;
@@ -246,11 +241,11 @@ export default function MapCanvas({
                 >
                   <div className="flex items-center gap-6">
                     <span className="text-2xl font-semibold whitespace-nowrap flex-1 min-w-0 truncate">
-                      {buildingName}
+                      {pin.label ?? 'Location'}
                     </span>
                     <button
                       onClick={() => onExplore?.(tooltipFor)}
-                      className="cursor-pointer shrink-0 leading-none"
+                      className="cursor-pointer shrink-0 leading-none font-lexendDeca"
                       aria-label="Explore building"
                     >
                       Click to explore building

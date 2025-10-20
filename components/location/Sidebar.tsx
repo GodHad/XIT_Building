@@ -117,16 +117,16 @@ export default function Sidebar({
         </div>
 
         <div className="h-20 px-6 flex items-center justify-between bg-[#0D0D0D] shrink-0 relative z-10">
-          {canPrev && (
-            <button onClick={() => go(-1)} className="flex items-center gap-3 cursor-pointer">
-              <img src="/images/home/ArrowButton.png" className="h-10 w-10 rotate-180" alt="" />
-              <span className="uppercase font-staatliches tracking-wide text-xl">Previous</span>
-            </button>
-          )}
           {canNext && (
             <button onClick={() => go(1)} className="flex items-center gap-3 cursor-pointer">
-              <span className="uppercase font-staatliches tracking-wide text-xl">Next</span>
               <img src="/images/home/ArrowButton.png" className="h-10 w-10" alt="" />
+              <span className="uppercase font-staatliches tracking-wide text-xl">Next</span>
+            </button>
+          )}
+          {canPrev && (
+            <button onClick={() => go(-1)} className="flex items-center gap-3 cursor-pointer">
+              <span className="uppercase font-staatliches tracking-wide text-xl">Previous</span>
+              <img src="/images/home/ArrowButton.png" className="h-10 w-10 rotate-180" alt="" />
             </button>
           )}
         </div>
