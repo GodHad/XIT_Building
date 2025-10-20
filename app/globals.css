@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@font-face {
+  font-family: Staatliches;
+  src: url('/public/fonts/Staatliches-Regular.woff') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: LexendDeca;
+  src: url('/public/fonts/LexendDeca-Regular.woff') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: LexendDeca;
+  src: url('/public/fonts/LEXENDDECA-SEMIBOLD.woff') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-staatliches: var(--font-staatliches);
+  --font-lexendDeca: var(--font-lexendDeca);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.backface-hidden {
+    backface-visibility: hidden;
+}
+
+.custom-scroll::-webkit-scrollbar { width: 8px; }
+.custom-scroll::-webkit-scrollbar-thumb { background: rgba(0,0,0,.12); border-radius: 8px; }
+.custom-scroll::-webkit-scrollbar-track { background: transparent; }
