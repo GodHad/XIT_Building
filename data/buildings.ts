@@ -431,7 +431,7 @@ export const tracks: BuildingTrack[] = [
       {
         id: "DeSoto_6",
         mediaType: "image",
-        src: "/images/building_content/DeSotoHotel/DeSoto_6.jpg",
+        src: "/images/building_content/DeSotoHotel/DeSoto_6.JPG",
         caption: "Room key and fob."
       },
       {

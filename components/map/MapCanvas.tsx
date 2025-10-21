@@ -240,7 +240,7 @@ export default function MapCanvas({
                   }}
                 >
                   <div className="flex items-center gap-6">
-                    <span className="text-2xl font-semibold whitespace-nowrap flex-1 min-w-0 truncate">
+                    <span className="text-xl font-staatliches font-semibold whitespace-nowrap flex-1 min-w-0 truncate">
                       {pin.label ?? 'Location'}
                     </span>
                     <button

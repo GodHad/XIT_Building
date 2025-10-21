@@ -97,7 +97,7 @@ export default function Sidebar({
           aria-label="Go to home"
           title="Menu"
         >
-          <FontAwesomeIcon className="text-white text-xl" icon={faBars} width={35} height={35} />
+          <FontAwesomeIcon className="text-white text-xl" icon={faBars} width={40} height={40} />
         </button>
       </div>
 
