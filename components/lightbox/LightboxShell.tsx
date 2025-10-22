@@ -2,6 +2,7 @@
 import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { ensureGsap } from '@/utils/gsapClient';
+import { useSoundEffect } from '@/hooks/useSoundEffect';
 
 export default function LightboxShell({
   onClose,
@@ -12,6 +13,8 @@ export default function LightboxShell({
 }) {
   const gsap = ensureGsap();
   const panelRef = useRef<HTMLDivElement | null>(null);
+
+  const clickSfx = useSoundEffect('/sounds/CLICK.mp3');
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
@@ -51,7 +54,7 @@ export default function LightboxShell({
           aria-modal="true"
         >
           <button
-            onClick={onClose}
+            onClick={() => { clickSfx(); setTimeout(() => onClose(), 200); }}
             aria-label="Close"
             className="absolute top-0 right-4 z-10 w-9 h-9 grid place-items-center text-white/90 hover:text-white text-5xl cursor-pointer"
           >

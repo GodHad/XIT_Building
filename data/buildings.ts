@@ -43,7 +43,7 @@ export const tracks: BuildingTrack[] = [
         id: "Schools_2",
         mediaType: "flipbook",
         thumb: "/images/building_content/Schools/Schools_2.jpg",
-        src: "/images/building_content/Schools/Schools_2_Flipbook_pages.pdf",
+        src: "/images/building_content/Schools/Schools_2",
         caption: "Dalhart Public Schools Announcement 1903",
         locationPin: "pin-1"
       },
@@ -86,7 +86,7 @@ export const tracks: BuildingTrack[] = [
         id: "Schools_8",
         mediaType: "flipbook",
         thumb: "/images/building_content/Schools/Schools_8.jpg",
-        src: "/images/building_content/Schools/Schools_8_Flipbook_pages.pdf",
+        src: "/images/building_content/Schools/Schools_8",
         caption: "Texas Teachers Daily Register First Grade 1922-23",
         locationPin: "pin-1"
       },
@@ -114,21 +114,21 @@ export const tracks: BuildingTrack[] = [
       {
         id: "Schools_12",
         mediaType: "image",
-        src: "/images/building_content/Schools/Schools_12.jpg",
+        src: "/images/building_content/Schools/Schools_12.JPG",
         caption: "Cornet belonging to Mrs. Burch Gregg. Mrs. Greg taught music and home economics at Dalhart in the 1920\u2019s and is credited with starting a band at the Dalhart School. She played this instrument in the 20\u2019s while playing in concerts.",
         locationPin: "pin-3"
       },
       {
         id: "Schools_13",
         mediaType: "image",
-        src: "/images/building_content/Schools/Schools_13.jpg",
+        src: "/images/building_content/Schools/Schools_13.JPG",
         caption: "Medals received by Nettie Mae Graham for the Consolation award at the state basketball tournament in Breckenridge, Texas 1929.",
         locationPin: "pin-3"
       },
       {
         id: "Schools_14",
         mediaType: "image",
-        src: "/images/building_content/Schools/Schools_14.jpg",
+        src: "/images/building_content/Schools/Schools_14.JPG",
         caption: "Football letter sweater belonging to Levi Reynolds. Levi was a multi-sport letterman for Dalhart in the 20\u2019s.",
         locationPin: "pin-3"
       },
@@ -183,13 +183,13 @@ export const tracks: BuildingTrack[] = [
       {
         id: "Firehouse_2",
         mediaType: "image",
-        src: "/images/building_content/Firehouse/Firehouse_2.jpg",
+        src: "/images/building_content/Firehouse/Firehouse_2.JPG",
         caption: "Early four man hose cart used between 1903-08."
       },
       {
         id: "Firehouse_3",
         mediaType: "image",
-        src: "/images/building_content/Firehouse/Firehouse_3.jpg",
+        src: "/images/building_content/Firehouse/Firehouse_3.JPG",
         caption: "Early fire helmet."
       },
       {
@@ -219,7 +219,7 @@ export const tracks: BuildingTrack[] = [
       {
         id: "Firehouse_8",
         mediaType: "image",
-        src: "/images/building_content/Firehouse/Firehouse_8.jpg",
+        src: "/images/building_content/Firehouse/Firehouse_8.JPG",
         caption: "Badge of W.J. Lacy, first fire chief."
       },
       {
@@ -244,7 +244,7 @@ export const tracks: BuildingTrack[] = [
         id: "Firehouse_12",
         mediaType: "flipbook",
         thumb: "/images/building_content/Firehouse/Firehouse_12.jpg",
-        src: "/images/building_content/Firehouse/Firehouse_12_Flipbook_pages.pdf",
+        src: "/images/building_content/Firehouse/Firehouse_12",
         caption: "13th Annual Ball for Volunteer Fire Department 1920 with dance card."
       },
       {
@@ -264,7 +264,7 @@ export const tracks: BuildingTrack[] = [
       {
         id: "Firehouse_15",
         mediaType: "image",
-        src: "/images/building_content/Firehouse/Firehouse_15.jpg",
+        src: "/images/building_content/Firehouse/Firehouse_15.JPG",
         caption: "New Emergency Response Center, Fire Department moved in in 2025.",
         locationPin: "pin-4"
       }
@@ -294,7 +294,7 @@ export const tracks: BuildingTrack[] = [
       {
         id: "Oxford_2",
         mediaType: "image",
-        src: "/images/building_content/Oxford_StFrancisHotel/Oxford_2.jpg",
+        src: "/images/building_content/Oxford_StFrancisHotel/Oxford_2.JPG",
         caption: "Key fob from the St. Francis."
       },
       {
@@ -312,13 +312,13 @@ export const tracks: BuildingTrack[] = [
       {
         id: "Oxford_5",
         mediaType: "image",
-        src: "/images/building_content/Oxford_StFrancisHotel/Oxford_5.jpg",
+        src: "/images/building_content/Oxford_StFrancisHotel/Oxford_5.JPG",
         caption: "Revolving register book holder from the Oxford."
       },
       {
         id: "Oxford_6",
         mediaType: "image",
-        src: "/images/building_content/Oxford_StFrancisHotel/Oxford_6.jpg",
+        src: "/images/building_content/Oxford_StFrancisHotel/Oxford_6.JPG",
         caption: "Follow Your Nose to The Oxford Hotel sign. Placed near the train depot."
       }
     ],
@@ -520,13 +520,13 @@ export const tracks: BuildingTrack[] = [
       {
         id: "XITMusuem_6",
         mediaType: "image",
-        src: "/images/building_content/XITMusuem/XITMusuem_6.jpg",
+        src: "/images/building_content/XITMusuem/XITMusuem_6.JPG",
         caption: "The current building has weathered time well with only a few changes to its outside and doubling in size."
       },
       {
         id: "XITMusuem_7",
         mediaType: "image",
-        src: "/images/building_content/XITMusuem/XITMusuem_7.jpg",
+        src: "/images/building_content/XITMusuem/XITMusuem_7.JPG",
         caption: "Leather key chain with museum logo stamped on it."
       }
     ],
@@ -555,7 +555,7 @@ export const tracks: BuildingTrack[] = [
       {
         id: "MasonicLodge_2",
         mediaType: "image",
-        src: "/images/building_content/MasonicLodge/MasonicLodge_2.jpg",
+        src: "/images/building_content/MasonicLodge/MasonicLodge_2.JPG",
         caption: "Wallet with Masonic symbols."
       },
       {
@@ -608,7 +608,7 @@ export const tracks: BuildingTrack[] = [
       {
         id: "Ice Plant_Bottling Works_2",
         mediaType: "image",
-        src: "/images/building_content/IcePlanBottlingWorks/Ice Plant_Bottling Works_2.jpg",
+        src: "/images/building_content/IcePlanBottlingWorks/Ice Plant_Bottling Works_2.JPG",
         caption: "The Dalhart Bottling works was located at 208 Rock Island between the Ice Plant and the Natatorium. In July 22, 1905 O. W. Raillard, manager, received 300 cases and 7,000 empty bottles for bottling all types of syrups such as vanilla, strawberry, Dr. Pepper and Ginger Ale. He also sold skim milk for five cents a gal. In 1908 the company was remodeled and they also sold Ice cream and crushed fruit.",
         locationPin: "pin-2"
       },
@@ -817,7 +817,7 @@ export const tracks: BuildingTrack[] = [
       {
         id: "PostOffice_3",
         mediaType: "image",
-        src: "/images/building_content/PostOffice/PostOffice_3.jpg",
+        src: "/images/building_content/PostOffice/PostOffice_3.JPG",
         caption: "Postmaster appointment certificate to W.H. Scarborough 1901."
       },
       {
@@ -849,13 +849,13 @@ export const tracks: BuildingTrack[] = [
       {
         id: "PostOffice_8",
         mediaType: "image",
-        src: "/images/building_content/PostOffice/PostOffice_8.jpg",
+        src: "/images/building_content/PostOffice/PostOffice_8.JPG",
         caption: "Mail box from the 1935 office."
       },
       {
         id: "PostOffice_9",
         mediaType: "image",
-        src: "/images/building_content/PostOffice/PostOffice_9.jpg",
+        src: "/images/building_content/PostOffice/PostOffice_9.JPG",
         caption: "Dalhart postal stamp"
       }
     ],
@@ -1306,7 +1306,7 @@ export const tracks: BuildingTrack[] = [
       {
         id: "Church_8",
         mediaType: "image",
-        src: "/images/building_content/Church/Church_8.jpg",
+        src: "/images/building_content/Church/Church_8.JPG",
         caption: "Promotional calendar for First Baptist Church 1923."
       },
       {
@@ -1319,7 +1319,7 @@ export const tracks: BuildingTrack[] = [
       {
         id: "Church_10",
         mediaType: "image",
-        src: "/images/building_content/Church/Church_10.jpg",
+        src: "/images/building_content/Church/Church_10.JPG",
         caption: "Later a new building was purchased on 16th street and occupied in 1988.",
         locationPin: "pin-6"
       },
@@ -1333,7 +1333,7 @@ export const tracks: BuildingTrack[] = [
       {
         id: "Church_12",
         mediaType: "image",
-        src: "/images/building_content/Church/Church_12.jpg",
+        src: "/images/building_content/Church/Church_12.JPG",
         caption: "In 1930 property was purchased on the 1306 Oak block. Later two buildings were purchased from the Dalhart Army Airfield and converted to a chapel and school building. The new church was dedicated in 1949 with the school opening in 1954. This building is still being used.",
         locationPin: "pin-8"
       },

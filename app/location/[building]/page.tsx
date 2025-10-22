@@ -14,8 +14,7 @@ export default function LocationPage() {
 
   const router = useRouter();
   const { building } = useParams<{ building: string }>();
-  const playClick = useSoundEffect('/sounds/button2.mp3');
-  const playPop   = useSoundEffect('/sounds/POPOPOP.mp3');
+  const playClick = useSoundEffect('/sounds/CLICK.mp3');
 
   const track = useMemo(
     () => tracks.find(t => t.id === building) ?? tracks[0],
@@ -41,7 +40,6 @@ export default function LocationPage() {
       { autoAlpha: 1, y: 0, duration: 0.25, stagger: 0.06, immediateRender: false },
       "-=0.15"
     )
-    .add(() => playPop(), "-=0.05");
 
     return () => { tl.kill(); }
   }, []);

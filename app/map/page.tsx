@@ -26,9 +26,10 @@ function useFlattenedPins() {
 const fmt = (s: string) => s.replace(/_/g, ' ').toUpperCase();
 
 export default function MapPage() {
-  const gsap = ensureGsap();
+  const gsapRef = useRef(ensureGsap());
+  const gsap = gsapRef.current;
   const router = useRouter();
-  const click = useSoundEffect('/sounds/button2.mp3');
+  const click = useSoundEffect('/sounds/CLICK.mp3');
   const pop   = useSoundEffect('/sounds/POPOPOP.mp3');
 
   const { pins: allPins, pinToBuilding } = useFlattenedPins();
@@ -54,12 +55,32 @@ export default function MapPage() {
   const itemRefs = useRef<HTMLButtonElement[]>([]);
   useEffect(() => {
     const tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
-    tl.fromTo(showAllRef.current, { opacity: 0, y: -8 }, { opacity: 1, y: 0, duration: 0.35 });
+
+    tl.add(() => {
+      try {
+        const r: any = (pop as any)();
+        r?.catch?.(() => {});
+      } catch {
+      }
+    }, 0);
+
+    tl.fromTo(
+      showAllRef.current,
+      { opacity: 0, y: -8 },
+      { opacity: 1, y: 0, duration: 0.35, immediateRender: false },
+      0
+    );
+
     itemRefs.current.forEach((el, i) => {
-      tl.fromTo(el, { opacity: 0, y: -10, scale: 0.98 }, { opacity: 1, y: 0, scale: 1, duration: 0.14 }, i === 0 ? '+=0.05' : '+=0.04');
+      tl.fromTo(
+        el,
+        { opacity: 0, y: -10, scale: 0.98 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.14, immediateRender: false },
+        i === 0 ? 0.05 : `+=0.04`
+      );
     });
-    tl.call(() => pop());
-    return () => { tl.kill(); };
+
+    return () => { tl.kill(); }
   }, []);
 
   const pill = (active: boolean) => [
@@ -89,7 +110,9 @@ export default function MapPage() {
                   key={b.id}
                   ref={el => { if (el) itemRefs.current[i] = el; }}
                   onClick={() => selectBuilding(b.id)}
-                  className={pill(filter === b.id)}
+                  className={
+                    pill(filter === b.id) + ' opacity-0 translate-y-2 scale-[0.98] will-change-transform'
+                  }
                 >
                   {fmt(b.name)}
                 </button>

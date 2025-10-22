@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useInactivityTimer } from '@/hooks/useInactivityTmer';
 import { ensureGsap } from "@/utils/gsapClient";
+import { useRouter } from 'next/navigation';
 
 const SLIDES = [
   '/images/home/XIT_Building_Kiosk_Screensavers-01.jpg',
@@ -16,6 +17,7 @@ const PERIOD_MS = Math.max(1000, HOLD_MS - FADE_MS);
 export default function ScreenSaver() {
   const { idle, reset } = useInactivityTimer(3 * 60 * 1000);
   const gsap = ensureGsap();
+  const router = useRouter();
 
   const rootRef  = useRef<HTMLButtonElement | null>(null);
   const frontRef = useRef<HTMLImageElement | null>(null);
@@ -104,9 +106,18 @@ export default function ScreenSaver() {
   }, [idle, gsap]);
 
   const onDismiss = () => {
+    if (timerRef.current) { window.clearInterval(timerRef.current); timerRef.current = null; }
+    if (tlRef.current)    { tlRef.current.kill(); tlRef.current = null; }
+
     const el = rootRef.current;
-    if (!el) return reset();
-    gsap.to(el, { opacity: 0, duration: 0.25, onComplete: reset });
+    if (!el) { router.push('/'); return; }
+
+    gsap.to(el, {
+      opacity: 0,
+      duration: 0.25,
+      ease: 'power1.out',
+      onComplete: () => router.push('/'),
+    });
   };
 
   if (!idle) return null;

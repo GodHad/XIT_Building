@@ -5,7 +5,7 @@ import LightboxShell from './LightboxShell';
 import type { PDFDocumentProxy, PDFPageProxy, RenderTask } from 'pdfjs-dist/types/src/display/api';
 
 type Props = {
-  url: string;
+  url: string;             // either a .pdf or a folder path
   onClose: () => void;
   onFlipSfx?: () => void;
   caption?: string;
@@ -14,7 +14,13 @@ type Props = {
 export default function PdfFlipBook({ url, onClose, onFlipSfx, caption }: Props) {
   const gsap = ensureGsap();
 
+  // mode detection
+  const isPdf = /\.pdf$/i.test(url);
+
+  // PDF state (only used in PDF mode)
   const [doc, setDoc] = useState<PDFDocumentProxy | null>(null);
+
+  // shared state
   const [pageCount, setPageCount] = useState(0);
   const [spread, setSpread] = useState(0);
   const [turning, setTurning] = useState(false);
@@ -29,22 +35,79 @@ export default function PdfFlipBook({ url, onClose, onFlipSfx, caption }: Props)
 
   const [arrowPos, setArrowPos] = useState<{left:{x:number,y:number}, right:{x:number,y:number}} | null>(null);
 
+  // ---------- Helpers for IMAGE mode ----------
+  const imgExtRef = useRef<'.jpg' | '.jpeg' | '.png' | '.webp'>('.jpg');
+  const baseDir = url.replace(/\/$/, ''); // trim trailing slash if present
+
+  const loadImage = (src: string) =>
+    new Promise<HTMLImageElement>((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = src;
+    });
+
+  // try 1.jpg/.jpeg/.png/.webp to pick the real extension
+  const detectImageExtension = useCallback(async (): Promise<string> => {
+    const candidates = ['.jpg', '.jpeg', '.png', '.webp'] as const;
+    for (const ext of candidates) {
+      try {
+        await loadImage(`${baseDir}/1${ext}`);
+        imgExtRef.current = ext;
+        return ext;
+      } catch {}
+    }
+    // default – most common
+    imgExtRef.current = '.jpg';
+    return '.jpg';
+  }, [baseDir]);
+
+  // discover number of pages by probing sequentially
+  const discoverImageCount = useCallback(async (): Promise<number> => {
+    // ensure we know the extension first
+    await detectImageExtension();
+    let n = 0;
+    for (let i = 1; i <= 400; i++) { // safety cap
+      try {
+        await loadImage(`${baseDir}/${i}${imgExtRef.current}`);
+        n = i;
+      } catch {
+        break;
+      }
+    }
+    return n;
+  }, [baseDir, detectImageExtension]);
+
+  // ---------- Mount / load ----------
   useEffect(() => {
     let mounted = true;
-    (async () => {
-      const pdfjs = await import('pdfjs-dist');
-      (pdfjs as any).GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
-      const mod = await import('pdfjs-dist/build/pdf.mjs');
-      const loadingTask = (mod as any).getDocument(url);
-      const d: PDFDocumentProxy = await loadingTask.promise;
-      if (!mounted) return;
-      setDoc(d);
-      setPageCount(d.numPages);
-      setSpread(0);
-    })();
-    return () => { mounted = false; };
-  }, [url]);
 
+    (async () => {
+      if (isPdf) {
+        // PDF mode
+        const pdfjs = await import('pdfjs-dist');
+        (pdfjs as any).GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
+        const mod = await import('pdfjs-dist/build/pdf.mjs');
+        const loadingTask = (mod as any).getDocument(url);
+        const d: PDFDocumentProxy = await loadingTask.promise;
+        if (!mounted) return;
+        setDoc(d);
+        setPageCount(d.numPages);
+        setSpread(0);
+      } else {
+        // IMAGE mode
+        const count = await discoverImageCount();
+        if (!mounted) return;
+        setDoc(null);
+        setPageCount(count);
+        setSpread(0);
+      }
+    })();
+
+    return () => { mounted = false; };
+  }, [url, isPdf, discoverImageCount]);
+
+  // compute left/right page numbers for a spread index
   const pagesForSpread = useCallback((s: number) => {
     if (s === 0) return { left: undefined as number | undefined, right: 1 };
     const left  = 2 * s;
@@ -52,7 +115,8 @@ export default function PdfFlipBook({ url, onClose, onFlipSfx, caption }: Props)
     return { left, right };
   }, [pageCount]);
 
-  const renderPageTo = useCallback(
+  // ---------- Rendering ----------
+  const renderPageToPdf = useCallback(
     async (pageNum: number | undefined, canvas: HTMLCanvasElement | null) => {
       if (!doc || !canvas || !pageNum) return;
 
@@ -93,6 +157,46 @@ export default function PdfFlipBook({ url, onClose, onFlipSfx, caption }: Props)
     },
     [doc]
   );
+
+  const renderPageToImage = useCallback(
+    async (pageNum: number | undefined, canvas: HTMLCanvasElement | null) => {
+      if (!canvas || !pageNum) return;
+      const host = spreadRef.current; if (!host) return;
+
+      const img = await loadImage(`${baseDir}/${pageNum}${imgExtRef.current}`);
+
+      const gap = 14;
+      const availW = (host.clientWidth - gap) / 2;
+      const availH = host.clientHeight;
+
+      const fitH   = availH / img.naturalHeight;
+      const cssW   = img.naturalWidth * fitH;
+      const scale  = cssW > availW ? (availW / img.naturalWidth) : fitH;
+
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+      canvas.width  = Math.max(1, Math.floor(img.naturalWidth  * scale * dpr));
+      canvas.height = Math.max(1, Math.floor(img.naturalHeight * scale * dpr));
+
+      canvas.style.width  = `${Math.floor(img.naturalWidth  * scale)}px`;
+      canvas.style.height = `${Math.floor(img.naturalHeight * scale)}px`;
+      canvas.style.display = 'block';
+      canvas.style.opacity = '1';
+
+      const ctx = canvas.getContext('2d')!;
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    },
+    [baseDir]
+  );
+
+  const renderPageTo = useCallback(async (pageNum?: number, canvas?: HTMLCanvasElement | null) => {
+    if (!pageNum || !canvas) return;
+    if (isPdf) return renderPageToPdf(pageNum, canvas);
+    return renderPageToImage(pageNum, canvas);
+  }, [isPdf, renderPageToPdf, renderPageToImage]);
 
   const renderOffscreen = async (pageNum?: number) => {
     if (!pageNum) return null;
@@ -137,7 +241,7 @@ export default function PdfFlipBook({ url, onClose, onFlipSfx, caption }: Props)
   }, []);
 
   const renderSpread = useCallback(async () => {
-    if (!doc || turning) return;
+    if (turning || pageCount === 0) return;
     const { left, right } = pagesForSpread(spread);
     const [offLeft, offRight] = await Promise.all([
       renderOffscreen(left),
@@ -162,8 +266,7 @@ export default function PdfFlipBook({ url, onClose, onFlipSfx, caption }: Props)
     if (offRight) blit(rightRef.current, offRight); else blank(rightRef.current);
 
     placeArrows();
-  }, [doc, spread, turning, pagesForSpread, placeArrows]);
-
+  }, [turning, pageCount, spread, pagesForSpread, renderOffscreen, placeArrows]);
 
   useEffect(() => { renderSpread(); }, [renderSpread]);
 
@@ -180,6 +283,7 @@ export default function PdfFlipBook({ url, onClose, onFlipSfx, caption }: Props)
     return !!right && right < pageCount;
   })();
 
+  // ---------- Flip animation (unchanged) ----------
   const makeSheet = (side: 'left'|'right', frontURL: string, backURL: string) => {
     const host = spreadRef.current!, overlay = overlayRef.current!;
     overlay.innerHTML = '';
@@ -234,7 +338,8 @@ export default function PdfFlipBook({ url, onClose, onFlipSfx, caption }: Props)
   };
 
   const flipNext = async () => {
-    if (!hasNext || !rightRef.current || turning) return;
+    const { right } = pagesForSpread(spread);
+    if (!hasNext || !rightRef.current || turning || !right) return;
     if (animationRef.current) { animationRef.current.kill(); animationRef.current = null; }
     setTurning(true);
     onFlipSfx?.();
@@ -273,7 +378,8 @@ export default function PdfFlipBook({ url, onClose, onFlipSfx, caption }: Props)
   };
 
   const flipPrev = async () => {
-    if (!hasPrev || !leftRef.current || turning) return;
+    const { left } = pagesForSpread(spread);
+    if (!hasPrev || !leftRef.current || turning || !left) return;
     if (animationRef.current) { animationRef.current.kill(); animationRef.current = null; }
     setTurning(true);
     onFlipSfx?.();
@@ -311,6 +417,7 @@ export default function PdfFlipBook({ url, onClose, onFlipSfx, caption }: Props)
     await tl.then();
   };
 
+  // ---------- UI (unchanged layout/styles) ----------
   return (
     <LightboxShell onClose={onClose}>
       <div className="flex-1 min-h-0 flex flex-col bg-[#2B2B2B]">
@@ -336,7 +443,7 @@ export default function PdfFlipBook({ url, onClose, onFlipSfx, caption }: Props)
 
               <div ref={overlayRef} className="absolute inset-0 pointer-events-none z-10" />
 
-              {arrowPos && hasPrev && (
+              {arrowPos && spread > 0 && (
                 <button
                   aria-label="Previous page"
                   onClick={flipPrev}
@@ -351,15 +458,18 @@ export default function PdfFlipBook({ url, onClose, onFlipSfx, caption }: Props)
                   <img src="/images/home/ArrowButton.png" className="w-10 h-10 rotate-90" alt="" />
                 </button>
               )}
-              {arrowPos && hasNext && (
+              {arrowPos && (() => {
+                const { right } = pagesForSpread(spread);
+                return !!right && right < pageCount;
+              })() && (
                 <button
                   aria-label="Next page"
                   onClick={flipNext}
                   disabled={turning}
                   className="absolute z-20 w-12 h-12 md:w-14 md:h-14 rounded-full bg-transparent grid place-items-center disabled:opacity-40 cursor-pointer"
                   style={{
-                    left: `${arrowPos.right.x}px`,
-                    top: `${arrowPos.right.y}px`,
+                    left: `${arrowPos!.right.x}px`,
+                    top: `${arrowPos!.right.y}px`,
                     transform: 'translate(-50%,-50%)',
                   }}
                 >
@@ -378,5 +488,4 @@ export default function PdfFlipBook({ url, onClose, onFlipSfx, caption }: Props)
       </div>
     </LightboxShell>
   );
-
 }

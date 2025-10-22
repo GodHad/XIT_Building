@@ -23,7 +23,7 @@ export default function Sidebar({
   const listRef  = useRef<HTMLDivElement | null>(null);
 
   const flipSfx  = useSoundEffect('/sounds/FLIP.mp3');
-  const clickSfx = useSoundEffect('/sounds/button2.mp3');
+  const clickSfx = useSoundEffect('/sounds/CLICK.mp3');
 
   useEffect(() => {
     if (!listRef.current) return;
@@ -46,7 +46,7 @@ export default function Sidebar({
     if (next === index) return;
 
     const nextSlide = slides[next];
-    flipSfx();
+    clickSfx();
 
     await Promise.race([preload(nextSlide.thumb ?? nextSlide.src), sleep(220)]);
     setIndex(next);
@@ -60,6 +60,7 @@ export default function Sidebar({
   };
 
   const onMenu = () => {
+    clickSfx();
     try {
       const tl = gsap.timeline({ defaults: { ease: 'power2.inOut' } });
 

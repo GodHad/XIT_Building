@@ -9,7 +9,7 @@ export default function HomeScreen() {
   const gsap = ensureGsap();
   const router = useRouter();
 
-  const clickSfx = useSoundEffect('/sounds/button2.mp3');
+  const clickSfx = useSoundEffect('/sounds/CLICK.mp3');
   const popSfx   = useSoundEffect('/sounds/POPOPOP.mp3');
 
   const PAD = 40;

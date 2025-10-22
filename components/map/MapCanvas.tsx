@@ -29,6 +29,7 @@ export default function MapCanvas({
   const gsap = ensureGsap();
   const playWhoosh  = useSoundEffect('/sounds/WHOOSH.mp3');
   const playTooltip = useSoundEffect('/sounds/TOOLTIP.mp3');
+  const playClick = useSoundEffect('/sounds/CLICK.mp3');
 
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const contentRef  = useRef<HTMLDivElement | null>(null);
@@ -40,7 +41,6 @@ export default function MapCanvas({
   const [nat, setNat] = useState({ w: 0, h: 0 });
   const baseScaleRef  = useRef(1);
   const firstFitDone  = useRef(false);
-  const droppedOnce   = useRef(false);
   const prevSelected  = useRef<string | undefined>(undefined);
 
   useEffect(() => {
@@ -116,15 +116,27 @@ export default function MapCanvas({
     centerOn(avgX, avgY, duration);
   }, [pins, centerOn, playWhoosh]);
 
+  const normalizeMulti = (ids: string) => ids.split(',').map(s => s.trim()).filter(Boolean).sort().join(',');
+
   useEffect(() => {
     if (!selectedId) return;
 
+    const ready = !!(contentRef.current && nat.w && nat.h);
+    if (!ready) return;
+
+    const prev = prevSelected.current;
+
     if (selectedId.includes(',')) {
+      const curNorm  = normalizeMulti(selectedId);
+      const prevNorm = (prev && prev.includes(',')) ? normalizeMulti(prev) : prev;
+      if (curNorm === prevNorm) return;
+      prevSelected.current = curNorm;
+
       centerOnIds(selectedId.split(','));
       return;
     }
 
-    const prev = prevSelected.current;
+    if (prev === selectedId) return; 
     prevSelected.current = selectedId;
 
     const currEl = contentRef.current?.querySelector(`[data-pin-id="${selectedId}"] img`) as HTMLElement | null;
@@ -135,7 +147,7 @@ export default function MapCanvas({
 
     const p = pins.find(p => p.id === selectedId);
     if (p) { playWhoosh(); centerOn(p.x, p.y, 0.75); }
-  }, [selectedId, pins, centerOn, gsap, playWhoosh]);
+  }, [selectedId, pins, nat.w, nat.h, centerOn, centerOnIds, gsap, playWhoosh]);
 
   const zoomBy = (factor: number) => {
     const el = contentRef.current, wrap = viewportRef.current;
@@ -203,7 +215,8 @@ export default function MapCanvas({
           {tooltipFor && (() => {
             const pin = pins.find(p => p.id === tooltipFor);
             if (!pin) return null;
-
+            
+            const buildingName = pin.label?.split('_')[0];
             const pinImg = contentRef.current?.querySelector(
               `[data-pin-id="${tooltipFor}"] img`
             ) as HTMLElement | null;
@@ -241,7 +254,7 @@ export default function MapCanvas({
                 >
                   <div className="flex items-center gap-6">
                     <span className="text-xl font-staatliches font-semibold whitespace-nowrap flex-1 min-w-0 truncate">
-                      {pin.label ?? 'Location'}
+                      {buildingName}
                     </span>
                     <button
                       onClick={() => onExplore?.(tooltipFor)}
@@ -271,13 +284,13 @@ export default function MapCanvas({
 
       {showControls && (
         <div className="absolute bottom-5 left-5 z-[200] flex flex-col items-start gap-2">
-          <button onClick={() => zoomBy(1/1.2)} className="cursor-pointer mx-auto" aria-label="Zoom out">
+          <button onClick={() => { playClick(); zoomBy(1/1.2) }} className="cursor-pointer mx-auto" aria-label="Zoom out">
             <img src="/images/home/MinusButton.png" className="h-14 w-14" alt="" />
           </button>
-          <button onClick={() => zoomBy(1.2)} className="cursor-pointer mx-auto" aria-label="Zoom in">
+          <button onClick={() => { playClick(); zoomBy(1.2) }} className="cursor-pointer mx-auto" aria-label="Zoom in">
             <img src="/images/home/PlusButton.png" className="h-14 w-14" alt="" />
           </button>
-          <button onClick={onHome} className="cursor-pointer mt-1" aria-label="Home">
+          <button onClick={() => { playClick(); setTimeout(() => onHome?.(), 200); }} className="cursor-pointer mt-1" aria-label="Home">
             <img src="/images/home/home-button.png" className="h-10 w-auto" alt="Home" />
           </button>
         </div>
