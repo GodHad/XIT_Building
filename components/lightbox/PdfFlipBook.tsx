@@ -5,7 +5,7 @@ import LightboxShell from './LightboxShell';
 import type { PDFDocumentProxy, PDFPageProxy, RenderTask } from 'pdfjs-dist/types/src/display/api';
 
 type Props = {
-  url: string;             // either a .pdf or a folder path
+  url: string; 
   onClose: () => void;
   onFlipSfx?: () => void;
   caption?: string;
@@ -14,13 +14,10 @@ type Props = {
 export default function PdfFlipBook({ url, onClose, onFlipSfx, caption }: Props) {
   const gsap = ensureGsap();
 
-  // mode detection
   const isPdf = /\.pdf$/i.test(url);
 
-  // PDF state (only used in PDF mode)
   const [doc, setDoc] = useState<PDFDocumentProxy | null>(null);
 
-  // shared state
   const [pageCount, setPageCount] = useState(0);
   const [spread, setSpread] = useState(0);
   const [turning, setTurning] = useState(false);
@@ -35,9 +32,8 @@ export default function PdfFlipBook({ url, onClose, onFlipSfx, caption }: Props)
 
   const [arrowPos, setArrowPos] = useState<{left:{x:number,y:number}, right:{x:number,y:number}} | null>(null);
 
-  // ---------- Helpers for IMAGE mode ----------
   const imgExtRef = useRef<'.jpg' | '.jpeg' | '.png' | '.webp'>('.jpg');
-  const baseDir = url.replace(/\/$/, ''); // trim trailing slash if present
+  const baseDir = url.replace(/\/$/, '');
 
   const loadImage = (src: string) =>
     new Promise<HTMLImageElement>((resolve, reject) => {
@@ -47,7 +43,6 @@ export default function PdfFlipBook({ url, onClose, onFlipSfx, caption }: Props)
       img.src = src;
     });
 
-  // try 1.jpg/.jpeg/.png/.webp to pick the real extension
   const detectImageExtension = useCallback(async (): Promise<string> => {
     const candidates = ['.jpg', '.jpeg', '.png', '.webp'] as const;
     for (const ext of candidates) {
@@ -57,14 +52,11 @@ export default function PdfFlipBook({ url, onClose, onFlipSfx, caption }: Props)
         return ext;
       } catch {}
     }
-    // default – most common
     imgExtRef.current = '.jpg';
     return '.jpg';
   }, [baseDir]);
 
-  // discover number of pages by probing sequentially
   const discoverImageCount = useCallback(async (): Promise<number> => {
-    // ensure we know the extension first
     await detectImageExtension();
     let n = 0;
     for (let i = 1; i <= 400; i++) { // safety cap
@@ -78,13 +70,11 @@ export default function PdfFlipBook({ url, onClose, onFlipSfx, caption }: Props)
     return n;
   }, [baseDir, detectImageExtension]);
 
-  // ---------- Mount / load ----------
   useEffect(() => {
     let mounted = true;
 
     (async () => {
       if (isPdf) {
-        // PDF mode
         const pdfjs = await import('pdfjs-dist');
         (pdfjs as any).GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
         const mod = await import('pdfjs-dist/build/pdf.mjs');
@@ -95,7 +85,6 @@ export default function PdfFlipBook({ url, onClose, onFlipSfx, caption }: Props)
         setPageCount(d.numPages);
         setSpread(0);
       } else {
-        // IMAGE mode
         const count = await discoverImageCount();
         if (!mounted) return;
         setDoc(null);
@@ -107,7 +96,6 @@ export default function PdfFlipBook({ url, onClose, onFlipSfx, caption }: Props)
     return () => { mounted = false; };
   }, [url, isPdf, discoverImageCount]);
 
-  // compute left/right page numbers for a spread index
   const pagesForSpread = useCallback((s: number) => {
     if (s === 0) return { left: undefined as number | undefined, right: 1 };
     const left  = 2 * s;
@@ -115,7 +103,6 @@ export default function PdfFlipBook({ url, onClose, onFlipSfx, caption }: Props)
     return { left, right };
   }, [pageCount]);
 
-  // ---------- Rendering ----------
   const renderPageToPdf = useCallback(
     async (pageNum: number | undefined, canvas: HTMLCanvasElement | null) => {
       if (!doc || !canvas || !pageNum) return;
@@ -283,7 +270,6 @@ export default function PdfFlipBook({ url, onClose, onFlipSfx, caption }: Props)
     return !!right && right < pageCount;
   })();
 
-  // ---------- Flip animation (unchanged) ----------
   const makeSheet = (side: 'left'|'right', frontURL: string, backURL: string) => {
     const host = spreadRef.current!, overlay = overlayRef.current!;
     overlay.innerHTML = '';
@@ -417,7 +403,6 @@ export default function PdfFlipBook({ url, onClose, onFlipSfx, caption }: Props)
     await tl.then();
   };
 
-  // ---------- UI (unchanged layout/styles) ----------
   return (
     <LightboxShell onClose={onClose}>
       <div className="flex-1 min-h-0 flex flex-col bg-[#2B2B2B]">
