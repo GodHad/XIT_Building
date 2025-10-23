@@ -43,7 +43,7 @@ export const tracks: BuildingTrack[] = [
         id: "Schools_2",
         mediaType: "flipbook",
         thumb: "/images/building_content/Schools/Schools_2.jpg",
-        src: "/images/building_content/Schools/Schools_2",
+        src: "/images/building_content/Schools/Schools_2_FlipBook",
         caption: "Dalhart Public Schools Announcement 1903",
         locationPin: "pin-1"
       },
@@ -86,7 +86,7 @@ export const tracks: BuildingTrack[] = [
         id: "Schools_8",
         mediaType: "flipbook",
         thumb: "/images/building_content/Schools/Schools_8.jpg",
-        src: "/images/building_content/Schools/Schools_8",
+        src: "/images/building_content/Schools/Schools_8_FlipBook",
         caption: "Texas Teachers Daily Register First Grade 1922-23",
         locationPin: "pin-1"
       },

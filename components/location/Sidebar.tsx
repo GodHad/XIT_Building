@@ -134,7 +134,13 @@ export default function Sidebar({
       </div>
 
       {opened && (opened.mediaType === 'flipbook'
-        ? <PdfFlipBook url={opened.src} caption={opened.caption} onClose={close} onFlipSfx={() => flipSfx()} />
+        ? <PdfFlipBook url={opened.src} caption={opened.caption} onClose={close} onFlipSfx={() => {
+            try {
+              void Promise
+                .resolve(flipSfx())
+                .catch(() => {});
+            } catch { }
+          }} />
         : <ImageLightbox src={opened.src} caption={opened.caption} onClose={close} />
       )}
     </aside>
