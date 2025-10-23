@@ -14,7 +14,7 @@ export default function LightboxShell({
   const gsap = ensureGsap();
   const panelRef = useRef<HTMLDivElement | null>(null);
 
-  const clickSfx = useSoundEffect('/sounds/CLICK.mp3');
+  const clickSfx = useSoundEffect('/sounds/click.mp3');
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };

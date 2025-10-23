@@ -29,8 +29,8 @@ export default function MapPage() {
   const gsapRef = useRef(ensureGsap());
   const gsap = gsapRef.current;
   const router = useRouter();
-  const click = useSoundEffect('/sounds/CLICK.mp3');
-  const pop   = useSoundEffect('/sounds/POPOPOP.mp3');
+  const click = useSoundEffect('/sounds/click.mp3');
+  const pop   = useSoundEffect('/sounds/popopop.mp3');
 
   const { pins: allPins, pinToBuilding } = useFlattenedPins();
 

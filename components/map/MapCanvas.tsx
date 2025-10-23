@@ -27,9 +27,9 @@ export default function MapCanvas({
   showArrows=false, onHome
 }: Props) {
   const gsap = ensureGsap();
-  const playWhoosh  = useSoundEffect('/sounds/WHOOSH.mp3');
-  const playTooltip = useSoundEffect('/sounds/TOOLTIP.mp3');
-  const playClick = useSoundEffect('/sounds/CLICK.mp3');
+  const playWhoosh  = useSoundEffect('/sounds/whoosh.mp3');
+  const playTooltip = useSoundEffect('/sounds/tooltip.mp3');
+  const playClick = useSoundEffect('/sounds/click.mp3');
 
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const contentRef  = useRef<HTMLDivElement | null>(null);
