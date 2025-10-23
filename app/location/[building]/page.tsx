@@ -14,7 +14,7 @@ export default function LocationPage() {
 
   const router = useRouter();
   const { building } = useParams<{ building: string }>();
-  const playClick = useSoundEffect('/sounds/click.mp3');
+  const playClick = useSoundEffect('/sounds/CLICK.mp3');
 
   const track = useMemo(
     () => tracks.find(t => t.id === building) ?? tracks[0],

@@ -23,7 +23,7 @@ export default function Sidebar({
   const listRef  = useRef<HTMLDivElement | null>(null);
 
   const flipSfx  = useSoundEffect('/sounds/flip.mp3');
-  const clickSfx = useSoundEffect('/sounds/click.mp3');
+  const clickSfx = useSoundEffect('/sounds/CLICK.mp3');
 
   useEffect(() => {
     if (!listRef.current) return;

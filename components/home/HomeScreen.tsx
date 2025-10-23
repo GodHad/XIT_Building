@@ -9,8 +9,8 @@ export default function HomeScreen() {
   const gsap = ensureGsap();
   const router = useRouter();
 
-  const clickSfx = useSoundEffect('/sounds/click.mp3');
-  const popSfx   = useSoundEffect('/sounds/popopop.mp3');
+  const clickSfx = useSoundEffect('/sounds/CLICK.mp3');
+  const popSfx   = useSoundEffect('/sounds/POPOPOP.mp3');
 
   const PAD = 40;
   const GUTTER_TO_SIDEBAR = 12;
