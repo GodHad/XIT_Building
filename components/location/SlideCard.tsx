@@ -12,34 +12,32 @@ function SlideCard({ slide, onOpen }: { slide: Slide; onOpen: (s: Slide) => void
   const capRef  = useRef<HTMLDivElement | null>(null);
 
   const GAP = 24;
-  const TIP_GAP_X = 10;
-  const TIP_OFFSET_TOP = 30;
+  const TIP_WIDTH = 90;
+  const TIP_TOP_OFFSET = 30;
 
-  const [imgWidth, setImgWidth] = useState<number | undefined>(undefined);
   const [reservedCap, setReservedCap] = useState<number>(slide.caption ? 96 : 0);
   const [availH, setAvailH] = useState(0);
-  const [tipMaxW, setTipMaxW] = useState<number | undefined>(undefined);
+  const [imgMaxW, setImgMaxW] = useState<number | undefined>(undefined);
 
   const measure = () => {
-    const wrapW = wrapRef.current?.clientWidth ?? 0;
-    const imgW  = imgRef.current?.clientWidth ?? 0;
+    const wrapH = wrapRef.current?.clientHeight ?? 0;
+    setAvailH(wrapH);
 
-    if (wrapRef.current) setAvailH(wrapRef.current.clientHeight || 0);
     if (capRef.current) {
       const h = capRef.current.offsetHeight || 0;
       setReservedCap(slide.caption ? h + GAP : 0);
     }
-    if (imgRef.current) setImgWidth(imgRef.current.clientWidth || undefined);
 
-    const spaceRight = Math.max(0, wrapW - imgW - TIP_GAP_X);
-    setTipMaxW(spaceRight || undefined);
+    const sidebarW = wrapRef.current?.clientWidth ?? 0;
+    const maxForImage = Math.max(0, sidebarW - TIP_WIDTH);
+    setImgMaxW(maxForImage || undefined);
   };
 
   useEffect(() => {
     setReservedCap(slide.caption ? 96 : 0);
     const t = requestAnimationFrame(measure);
     return () => cancelAnimationFrame(t);
-  }, [slide.src, slide.caption]);
+  }, [slide.src, slide.thumb, slide.caption]);
 
   useEffect(() => {
     const onR = () => measure();
@@ -55,12 +53,15 @@ function SlideCard({ slide, onOpen }: { slide: Slide; onOpen: (s: Slide) => void
         type="button"
         onClick={() => onOpen(slide)}
         aria-label="Open media"
-        className="shrink-0 flex items-start bg-transparent cursor-pointer"
+        className="shrink-0 bg-transparent cursor-pointer block text-left"
       >
-        <div className="relative inline-block max-w-full">
+        <div
+          className="relative inline-block align-top"
+          style={{ maxWidth: imgMaxW }}
+        >
           <img
             ref={imgRef}
-            src={isPdf ? (slide.thumb ?? slide.src) : (slide.thumb ?? slide.src)}
+            src={slide.thumb ?? slide.src}
             alt=""
             className="block h-auto w-auto max-w-full object-contain"
             style={{ maxHeight: `${imgMaxH}px` }}
@@ -73,16 +74,14 @@ function SlideCard({ slide, onOpen }: { slide: Slide; onOpen: (s: Slide) => void
               className="absolute pointer-events-none"
               style={{
                 left: '100%',
-                top: TIP_OFFSET_TOP,
-                maxWidth: tipMaxW,
+                top: TIP_TOP_OFFSET,
+                width: TIP_WIDTH,
               }}
             >
-              <div className="bg-white text-black rounded-tr-lg rounded-br-lg shadow border border-black/10 px-2 py-2 flex flex-col items-start gap-1">
-                <div className='flex justify-center w-full'>
-                  <FontAwesomeIcon icon={faBookOpen} className="h-8 w-8" />
-                </div>
-                <span className="text-sm leading-snug font-medium">
-                  Click to flip through booklet
+              <div className="bg-white text-black rounded-tr-lg rounded-br-lg shadow border border-black/10 px-2 py-1.5 flex flex-col items-center gap-1">
+                <FontAwesomeIcon icon={faBookOpen} className="h-5 w-5" />
+                <span className="text-[14px] leading-tight font-medium text-center">
+                  Click to flip through<br/>booklet
                 </span>
               </div>
             </div>
@@ -93,11 +92,7 @@ function SlideCard({ slide, onOpen }: { slide: Slide; onOpen: (s: Slide) => void
       {slide.caption && (
         <div ref={capRef} className="px-1 shrink-0 w-full">
           <div style={{ height: GAP }} />
-          <p
-            className="text-white text-sm leading-snug w-full"
-          >
-            {slide.caption}
-          </p>
+          <p className="text-white text-sm leading-snug w-full">{slide.caption}</p>
         </div>
       )}
     </div>

@@ -1286,7 +1286,7 @@ export const tracks: BuildingTrack[] = [
       {
         id: "Church_5",
         mediaType: "image",
-        src: "/images/building_content/Church/Church_5.jpg",
+        src: "/images/building_content/Church/Church_5.JPG",
         caption: "Because of age of the building and lack of space a new building was constructed on the block south of the present building. This building is located at 601 Rock Island and was finished in 2017.",
         locationPin: "pin-3"
       },

@@ -85,16 +85,46 @@ export default function PdfFlipBook({ url, onClose, onFlipSfx, caption }: Props)
         setPageCount(d.numPages);
         setSpread(0);
       } else {
-        const count = await discoverImageCount();
+        await detectImageExtension();
+        try {
+          await loadImage(`${baseDir}/1${imgExtRef.current}`);
+        } catch {
+          if (!mounted) return;
+          setDoc(null);
+          setPageCount(0);
+          setSpread(0);
+          return;
+        }
         if (!mounted) return;
         setDoc(null);
-        setPageCount(count);
         setSpread(0);
+        setPageCount(1);
+
+        (async () => {
+          try {
+            await loadImage(`${baseDir}/2${imgExtRef.current}`);
+            if (!mounted) return;
+            setPageCount(prev => (prev < 2 ? 2 : prev));
+
+            await loadImage(`${baseDir}/3${imgExtRef.current}`);
+            if (!mounted) return;
+            setPageCount(prev => (prev < 3 ? 3 : prev));
+          } catch {
+          }
+        })();
+
+        (async () => {
+          const count = await discoverImageCount();
+          if (!mounted) return;
+          setPageCount(count);
+        })();
       }
+
     })();
 
     return () => { mounted = false; };
-  }, [url, isPdf, discoverImageCount]);
+  }, [url, isPdf, discoverImageCount ]);
+
 
   const pagesForSpread = useCallback((s: number) => {
     if (s === 0) return { left: undefined as number | undefined, right: 1 };
