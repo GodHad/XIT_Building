@@ -1,60 +1,21 @@
-import { useEffect, useRef } from 'react';
+'use client';
+import { useCallback } from 'react';
+import { playFx } from '@/utils/audioEngine';
 
-export function useSoundEffect(src: string, poolSize = 3) {
-  const poolRef = useRef<HTMLAudioElement[]>([]);
-  const unlockedRef = useRef(false);
+const META: Record<string, { id: string; group: string; vol: number }> = {
+  'CLICK':   { id: 'click',   group: 'ui',   vol: 0.8 },
+  'FLIP':    { id: 'flip',    group: 'ui',   vol: 0.9 },
+  'WHOOSH':  { id: 'whoosh',  group: 'move', vol: 0.75 },
+  'TOOLTIP': { id: 'tooltip', group: 'ui',   vol: 0.6 },
+  'POPOPOP': { id: 'pop',     group: 'ui',   vol: 0.85 },
+};
 
-  useEffect(() => {
-    const pool: HTMLAudioElement[] = Array.from({ length: poolSize }, () => {
-      const a = new Audio(src);
-      a.preload = 'auto';
-      a.load();
-      return a;
-    });
-    poolRef.current = pool;
+export function useSoundEffect(urlOrId: string) {
+  const base = urlOrId.split('/').pop() || urlOrId;
+  const name = (base.split('.')[0] || base).toUpperCase();
+  const meta = META[name] ?? META['CLICK'];
 
-    const unlock = () => {
-      if (unlockedRef.current) return;
-      unlockedRef.current = true;
-      poolRef.current.forEach(a => {
-        a.play().then(() => {
-          a.pause();
-          a.currentTime = 0;
-        }).catch(() => {
-        });
-      });
-    };
-
-    window.addEventListener('pointerdown', unlock, { once: true });
-    window.addEventListener('keydown', unlock,   { once: true });
-
-    return () => {
-      window.removeEventListener('pointerdown', unlock);
-      window.removeEventListener('keydown', unlock);
-      poolRef.current.forEach(a => { a.src = ''; a.load(); });
-      poolRef.current = [];
-      unlockedRef.current = false;
-    };
-  }, [src, poolSize]);
-
-  const play = () => {
-    const pool = poolRef.current;
-    if (!pool.length) return;
-
-    let el = pool.find(a => a.paused || a.ended);
-    if (!el) {
-      const clone = pool[0].cloneNode() as HTMLAudioElement;
-      clone.src = pool[0].src;
-      pool.push(clone);
-      el = clone;
-    }
-
-    try {
-      el.currentTime = 0;
-      void el.play().catch(() => {});
-    } catch {
-    }
-  };
-
-  return play;
+  return useCallback(() => {
+    playFx(meta.id, { exclusiveKey: meta.group, volume: meta.vol });
+  }, [meta]);
 }

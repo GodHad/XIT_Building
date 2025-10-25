@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { staatliches } from "./fonts";
 import { lexendDeca } from './fonts';
+import AudioBoot from "./AudioBoot";
 
 export const metadata: Metadata = {
   title: "XIT_Building",
@@ -16,6 +17,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${lexendDeca.variable} ${staatliches.variable} `}>
       <body className="!w-screen !h-screen">
+        <AudioBoot />
         {children}
       </body>
     </html>

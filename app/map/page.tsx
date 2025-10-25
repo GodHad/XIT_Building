@@ -141,7 +141,7 @@ export default function MapPage() {
               click(); router.push(`/location/${b}`);
             }}
             fitMode='width'
-            onHome={() => { click(); router.push('/'); }}
+            onHome={() => { router.push('/'); }}
           />
         </div>
       </div>
