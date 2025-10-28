@@ -22,8 +22,8 @@ export default function Sidebar({
   const asideRef = useRef<HTMLDivElement | null>(null);
   const listRef  = useRef<HTMLDivElement | null>(null);
 
-  const flipSfx  = useSoundEffect('/sounds/FLIP.mp3');
-  const clickSfx = useSoundEffect('/sounds/CLICK.mp3');
+  const flipSfx  = useSoundEffect('/sounds/FLIP.wav');
+  const clickSfx = useSoundEffect('/sounds/CLICK.wav');
 
   useEffect(() => {
     if (!listRef.current) return;
