@@ -2,7 +2,7 @@
 import { Slide } from '@/data/types';
 import { memo, useEffect, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBookOpen } from '@fortawesome/free-solid-svg-icons';
+import { faBookOpen, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 
 function SlideCard({ slide, onOpen }: { slide: Slide; onOpen: (s: Slide) => void }) {
   const isPdf = slide.mediaType === 'flipbook';
@@ -69,7 +69,7 @@ function SlideCard({ slide, onOpen }: { slide: Slide; onOpen: (s: Slide) => void
             draggable={false}
           />
 
-          {isPdf && (
+          {isPdf ? (
             <div
               className="absolute pointer-events-none"
               style={{
@@ -83,6 +83,12 @@ function SlideCard({ slide, onOpen }: { slide: Slide; onOpen: (s: Slide) => void
                 <span className="text-[14px] leading-tight font-medium text-center">
                   Click to flip through<br/>booklet
                 </span>
+              </div>
+            </div>
+          ) : (
+            <div className='absolute rounded-full bg-[#c7c8c1] w-13 h-13 top-0 left-0 z-90'>
+              <div className='flex flex-col items-center justify-center w-full h-full'>
+                <FontAwesomeIcon icon={faMagnifyingGlass} className='w-full h-full text-black text-2xl font-black' />
               </div>
             </div>
           )}

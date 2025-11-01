@@ -19,12 +19,14 @@ type Props = {
   minScaleMul?: number;
   showArrows?: boolean;      
   onHome?: () => void;
+  onUserPin?: () => void;
 };
 
 export default function MapCanvas({
   mapSrc, pins, selectedId, onSelectPin, onExplore,
   fitMode='contain', showControls=true, initialScaleMul=1, minScaleMul=0.5,
-  showArrows=false, onHome
+  showArrows=false, onHome,
+  onUserPin
 }: Props) {
   const gsap = ensureGsap();
   const playWhoosh  = useSoundEffect('/sounds/WHOOSH.wav');
@@ -42,6 +44,7 @@ export default function MapCanvas({
   const baseScaleRef  = useRef(1);
   const firstFitDone  = useRef(false);
   const prevSelected  = useRef<string | undefined>(undefined);
+  const panNotifiedRef = useRef(false);
 
   useEffect(() => {
     if (contentRef.current) gsap.set(contentRef.current, { transformOrigin: '0 0' });
@@ -52,7 +55,16 @@ export default function MapCanvas({
       cursor: 'grab',
       activeCursor: 'grabbing',
       zIndexBoost: false,
-      onDrag: () => setTooltipFor(null),
+      onDrag: () => {
+        setTooltipFor(null);
+        if(!panNotifiedRef.current) {
+          onUserPin?.();
+          panNotifiedRef.current = true;
+        }
+      },
+      onDragEnd: () => {
+        panNotifiedRef.current = false;
+      }
     });
     return () => d.forEach(x => x.kill());
   }, [gsap]);
@@ -285,13 +297,13 @@ export default function MapCanvas({
       {showControls && (
         <div className="absolute bottom-5 left-5 z-[200] flex flex-col items-start gap-2">
           <button onClick={() => { playClick(); zoomBy(1/1.2) }} className="cursor-pointer mx-auto" aria-label="Zoom out">
-            <img src="/images/home/MinusButton.png" className="h-14 w-14" alt="" />
+            <img src="/images/home/MinusButton.png" className="h-16 w-16" alt="" />
           </button>
           <button onClick={() => { playClick(); zoomBy(1.2) }} className="cursor-pointer mx-auto" aria-label="Zoom in">
-            <img src="/images/home/PlusButton.png" className="h-14 w-14" alt="" />
+            <img src="/images/home/PlusButton.png" className="h-16 w-16" alt="" />
           </button>
           <button onClick={() => { playClick(); setTimeout(() => onHome?.(), 200); }} className="cursor-pointer mt-1" aria-label="Home">
-            <img src="/images/home/home-button.png" className="h-10 w-auto" alt="Home" />
+            <img src="/images/home/home-button.png" className="h-12 w-auto" alt="Home" />
           </button>
         </div>
       )}

@@ -7,6 +7,7 @@ import { useMemo, useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ensureGsap } from "@/utils/gsapClient";
 import { useSoundEffect } from "@/hooks/useSoundEffect";
+import type { Pin } from '@/data/types';
 
 export default function LocationPage() {
   const gsapRef = useRef(ensureGsap());
@@ -45,7 +46,18 @@ export default function LocationPage() {
   }, []);
 
   const [index, setIndex] = useState(0);
-  const [activePin, setActivePin] = useState<string | undefined>(track.startPinId);
+  const [activePin, setActivePin] = useState<string | undefined>(() => {
+    return track.startPinId ?? track.pins[0]?.id;
+  });
+
+  useEffect(() => {
+    setActivePin(track.startPinId ??track.pins[0]?.id);
+  }, [track]);
+
+  const visiblePins = useMemo<Pin[]>(() => {
+    if(!activePin) return [];
+    return track.pins.filter(p => p.id === activePin);
+  }, [track.pins, activePin])
 
   const exitToMap = () => {
     playClick();
@@ -79,12 +91,12 @@ export default function LocationPage() {
             aria-label="Open map"
             title="Open map"
           >
-            <img src="/images/home/MapButton.png" className="h-14 w-14" alt="" />
+            <img src="/images/home/MapButton.png" className="h-16 w-16" alt="" />
           </button>
 
           <MapCanvas
             mapSrc={track.mapRef}
-            pins={track.pins.map(p => ({ ...p, id: p.id }))}
+            pins={visiblePins}
             selectedId={activePin}
             onSelectPin={setActivePin}
             showControls={false}

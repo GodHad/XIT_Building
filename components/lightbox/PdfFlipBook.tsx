@@ -35,6 +35,47 @@ export default function PdfFlipBook({ url, onClose, onFlipSfx, caption }: Props)
   const imgExtRef = useRef<'.jpg' | '.jpeg' | '.png' | '.webp'>('.jpg');
   const baseDir = url.replace(/\/$/, '');
 
+  async function headExists(url: string): Promise<boolean> {
+    try {
+      const res = await fetch(url, { method: 'HEAD', cache: 'no-store' });
+      return res.ok;
+    } catch { return false; }
+  }
+
+  function imgExists(url: string): Promise<boolean> {
+    return new Promise(resolve => {
+      const img = new Image();
+      const done = (ok: boolean) => { img.onload = img.onerror = null; img.src = ''; resolve(ok); };
+      img.onload = () => done(true);
+      img.onerror = () => done(false);
+      img.decoding = 'async';
+      img.src = url;
+    })
+  }
+
+  async function urlExists(url: string): Promise<boolean> {
+    return (await headExists(url) || (await imgExists(url)));
+  }
+
+  async function probeImageCount(baseDir: string, ext: string, max = 55): Promise<number> {
+    if(!(await urlExists(`${baseDir}/1${ext}`))) return 0;
+    let low = 1;
+    let high = 2;
+    while(high <= max && (await urlExists(`${baseDir}/${high}${ext}`))) {
+      low = high;
+      high <<= 1;
+    }
+    if(high > max) high = max;
+
+    let L = low, R = high;
+    while(L < R) {
+      const mid = Math.ceil((L + R + 1) / 2);
+      if(await urlExists(`${baseDir}/${mid}${ext}`)) L = mid;
+      else R = mid - 1;
+    }
+    return L;
+  }
+
   const loadImage = (src: string) =>
     new Promise<HTMLImageElement>((resolve, reject) => {
       const img = new Image();
@@ -56,20 +97,6 @@ export default function PdfFlipBook({ url, onClose, onFlipSfx, caption }: Props)
     return '.jpg';
   }, [baseDir]);
 
-  const discoverImageCount = useCallback(async (): Promise<number> => {
-    await detectImageExtension();
-    let n = 0;
-    for (let i = 1; i <= 400; i++) { // safety cap
-      try {
-        await loadImage(`${baseDir}/${i}${imgExtRef.current}`);
-        n = i;
-      } catch {
-        break;
-      }
-    }
-    return n;
-  }, [baseDir, detectImageExtension]);
-
   useEffect(() => {
     let mounted = true;
 
@@ -86,36 +113,30 @@ export default function PdfFlipBook({ url, onClose, onFlipSfx, caption }: Props)
         setSpread(0);
       } else {
         await detectImageExtension();
-        try {
-          await loadImage(`${baseDir}/1${imgExtRef.current}`);
-        } catch {
-          if (!mounted) return;
-          setDoc(null);
-          setPageCount(0);
-          setSpread(0);
+
+        if(!(await urlExists(`${baseDir}/1${imgExtRef.current}`))) {
+          if(!mounted) return;
+          setDoc(null); setPageCount(0); setSpread(0);
           return;
         }
-        if (!mounted) return;
+        if(!mounted) return;
         setDoc(null);
         setSpread(0);
         setPageCount(1);
 
         (async () => {
-          try {
-            await loadImage(`${baseDir}/2${imgExtRef.current}`);
-            if (!mounted) return;
-            setPageCount(prev => (prev < 2 ? 2 : prev));
+          const p2 = await urlExists(`${baseDir}/2${imgExtRef.current}`);
+          if(!mounted) return;
+          if(p2) setPageCount(c => (c < 2 ? 2 : c));
 
-            await loadImage(`${baseDir}/3${imgExtRef.current}`);
-            if (!mounted) return;
-            setPageCount(prev => (prev < 3 ? 3 : prev));
-          } catch {
-          }
+          const p3 = p2 && await urlExists(`${baseDir}/3${imgExtRef.current}`);
+          if(!mounted) return;
+          if(p3) setPageCount(c => (c < 3 ? 3 : c));
         })();
 
         (async () => {
-          const count = await discoverImageCount();
-          if (!mounted) return;
+          const count = await probeImageCount(baseDir, imgExtRef.current, 55);
+          if(!mounted) return;
           setPageCount(count);
         })();
       }
@@ -123,8 +144,13 @@ export default function PdfFlipBook({ url, onClose, onFlipSfx, caption }: Props)
     })();
 
     return () => { mounted = false; };
-  }, [url, isPdf, discoverImageCount ]);
+  }, [url, isPdf, baseDir, detectImageExtension ]);
 
+  function canvasToObjectURL(c: HTMLCanvasElement): Promise<string> {
+    return new Promise((resolve, reject) => {
+      c.toBlob(b => b ? resolve(URL.createObjectURL(b)) : reject(new Error('toBlob failed')), 'image/png');
+    });
+  }
 
   const pagesForSpread = useCallback((s: number) => {
     if (s === 0) return { left: undefined as number | undefined, right: 1 };
@@ -151,7 +177,7 @@ export default function PdfFlipBook({ url, onClose, onFlipSfx, caption }: Props)
       const cssW   = v.width * fitH;
       const scale  = cssW > availW ? (availW / v.width) : fitH;
 
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.25);
       const vp  = page.getViewport({ scale: scale * dpr });
 
       canvas.width  = Math.max(1, Math.floor(vp.width));
@@ -190,7 +216,7 @@ export default function PdfFlipBook({ url, onClose, onFlipSfx, caption }: Props)
       const cssW   = img.naturalWidth * fitH;
       const scale  = cssW > availW ? (availW / img.naturalWidth) : fitH;
 
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.25);
 
       canvas.width  = Math.max(1, Math.floor(img.naturalWidth  * scale * dpr));
       canvas.height = Math.max(1, Math.floor(img.naturalHeight * scale * dpr));
@@ -267,6 +293,7 @@ export default function PdfFlipBook({ url, onClose, onFlipSfx, caption }: Props)
 
     if (offLeft) {
       blit(leftRef.current, offLeft);
+      offLeft.width = offLeft.height = 0;
     } else {
       const L = leftRef.current, R = rightRef.current;
       if (L && R) {
@@ -280,7 +307,11 @@ export default function PdfFlipBook({ url, onClose, onFlipSfx, caption }: Props)
       blank(leftRef.current);
     }
 
-    if (offRight) blit(rightRef.current, offRight); else blank(rightRef.current);
+    if (offRight) {
+      blit(rightRef.current, offRight); 
+      offRight.width = offRight.height = 0;
+    }
+    else blank(rightRef.current);
 
     placeArrows();
   }, [turning, pageCount, spread, pagesForSpread, renderOffscreen, placeArrows]);
@@ -363,34 +394,53 @@ export default function PdfFlipBook({ url, onClose, onFlipSfx, caption }: Props)
     const nextSpread = spread + 1;
     const nxt = pagesForSpread(nextSpread);
 
-    const [offLeft, offRight] = await Promise.all([
-      renderOffscreen(nxt.left),
-      renderOffscreen(nxt.right),
-    ]);
+    let offLeft: HTMLCanvasElement | null = null;
+    let offRight: HTMLCanvasElement | null = null;
 
-    const frontURL = rightRef.current.toDataURL('image/png');
-    const backURL  = offLeft ? offLeft.toDataURL('image/png') : frontURL;
-    const sheet = makeSheet('right', frontURL, backURL);
+    const urlsToRevoke: string[] = [];
 
-    const tl = gsap.timeline({ defaults: { ease: 'power2.inOut' } });
-    animationRef.current = tl;
+    try {
+      [offLeft, offRight] = await Promise.all([
+        renderOffscreen(nxt.left),
+        renderOffscreen(nxt.right),
+      ]);
 
-    tl.set(sheet, { rotateY: 0 })
-      .to('.turn-shade', { opacity: 0.22, duration: 0.22 }, 0)
-      .add(() => { if (offRight) blit(rightRef.current, offRight); else blank(rightRef.current); }, 0.01)
-      .to(sheet, { rotateY: -179.5, duration: 0.65 }, 0)
-      .add(() => { if (offLeft) blit(leftRef.current, offLeft); else blank(leftRef.current); })
-      .to(sheet, { rotateY: -180, duration: 0.02 })
-      .to('.turn-shade', { opacity: 0.0, duration: 0.10 }, '<')
-      .add(() => {
-        if (overlayRef.current) overlayRef.current.innerHTML = '';
-        setSpread(nextSpread);
-        setTurning(false);
-        animationRef.current = null;
-        placeArrows();
-      });
+      const frontURL = await canvasToObjectURL(rightRef.current);
+      urlsToRevoke.push(frontURL);
 
-    await tl.then();
+      const backURL = offLeft ? await canvasToObjectURL(offLeft) : frontURL;
+      if (backURL !== frontURL) urlsToRevoke.push(backURL);
+
+      const sheet = makeSheet('right', frontURL, backURL);
+
+      const tl = gsap.timeline({ defaults: { ease: 'power2.inOut' } });
+      animationRef.current = tl;
+
+      tl.set(sheet, { rotateY: 0 })
+        .to('.turn-shade', { opacity: 0.22, duration: 0.22 }, 0)
+        .add(() => { if (offRight) blit(rightRef.current, offRight); else blank(rightRef.current); }, 0.01)
+        .to(sheet, { rotateY: -179.5, duration: 0.65 }, 0)
+        .add(() => { if (offLeft) blit(leftRef.current, offLeft); else blank(leftRef.current); })
+        .to(sheet, { rotateY: -180, duration: 0.02 })
+        .to('.turn-shade', { opacity: 0.0, duration: 0.10 }, '<')
+        .add(() => {
+          if (overlayRef.current) overlayRef.current.innerHTML = '';
+          setSpread(nextSpread);
+          placeArrows();
+        });
+
+      await tl.then();
+    } finally {
+      animationRef.current = null;
+      setTurning(false);
+
+      if (offLeft)  { offLeft.width = 0; offLeft.height = 0; }
+      if (offRight) { offRight.width = 0; offRight.height = 0; }
+
+      for (const u of urlsToRevoke) {
+        try { URL.revokeObjectURL(u); } catch {}
+      }
+    }
   };
 
   const flipPrev = async () => {
@@ -403,34 +453,52 @@ export default function PdfFlipBook({ url, onClose, onFlipSfx, caption }: Props)
     const prevSpread = spread - 1;
     const prv = pagesForSpread(prevSpread);
 
-    const [offLeft, offRight] = await Promise.all([
-      renderOffscreen(prv.left),
-      renderOffscreen(prv.right),
-    ]);
+    let offLeft: HTMLCanvasElement | null = null;
+    let offRight: HTMLCanvasElement | null = null;
+    const urlsToRevoke: string[] = [];
 
-    const frontURL = leftRef.current.toDataURL('image/png');
-    const backURL  = offRight ? offRight.toDataURL('image/png') : frontURL;
-    const sheet = makeSheet('left', frontURL, backURL);
+    try {
+      [offLeft, offRight] = await Promise.all([
+        renderOffscreen(prv.left),
+        renderOffscreen(prv.right),
+      ]);
 
-    const tl = gsap.timeline({ defaults: { ease: 'power2.inOut' } });
-    animationRef.current = tl;
+      const frontURL = await canvasToObjectURL(leftRef.current);
+      urlsToRevoke.push(frontURL);
 
-    tl.set(sheet, { rotateY: 0 })
-      .to('.turn-shade', { opacity: 0.22, duration: 0.22 }, 0)
-      .add(() => { if (offLeft) blit(leftRef.current, offLeft); else blank(leftRef.current); }, 0.01)
-      .to(sheet, { rotateY: 179.5, duration: 0.65 }, 0)
-      .add(() => { if (offRight) blit(rightRef.current, offRight); else blank(rightRef.current); })
-      .to(sheet, { rotateY: 180, duration: 0.02 })
-      .to('.turn-shade', { opacity: 0.0, duration: 0.10 }, '<')
-      .add(() => {
-        if (overlayRef.current) overlayRef.current.innerHTML = '';
-        setSpread(prevSpread);
-        setTurning(false);
-        animationRef.current = null;
-        placeArrows();
-      });
+      const backURL  = offRight ? await canvasToObjectURL(offRight) : frontURL;
+      if (backURL !== frontURL) urlsToRevoke.push(backURL);
 
-    await tl.then();
+      const sheet = makeSheet('left', frontURL, backURL);
+
+      const tl = gsap.timeline({ defaults: { ease: 'power2.inOut' } });
+      animationRef.current = tl;
+
+      tl.set(sheet, { rotateY: 0 })
+        .to('.turn-shade', { opacity: 0.22, duration: 0.22 }, 0)
+        .add(() => { if (offLeft) blit(leftRef.current, offLeft); else blank(leftRef.current); }, 0.01)
+        .to(sheet, { rotateY: 179.5, duration: 0.65 }, 0)
+        .add(() => { if (offRight) blit(rightRef.current, offRight); else blank(rightRef.current); })
+        .to(sheet, { rotateY: 180, duration: 0.02 })
+        .to('.turn-shade', { opacity: 0.0, duration: 0.10 }, '<')
+        .add(() => {
+          if (overlayRef.current) overlayRef.current.innerHTML = '';
+          setSpread(prevSpread);
+          placeArrows();
+        });
+
+      await tl.then();
+    } finally {
+      animationRef.current = null;
+      setTurning(false);
+
+      if (offLeft)  { offLeft.width = 0; offLeft.height = 0; }
+      if (offRight) { offRight.width = 0; offRight.height = 0; }
+
+      for (const u of urlsToRevoke) {
+        try { URL.revokeObjectURL(u); } catch {}
+      }
+    }
   };
 
   return (

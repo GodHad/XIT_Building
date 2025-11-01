@@ -257,8 +257,8 @@ export default function HomeScreen() {
 
       <div ref={exploreWrapRef} className="absolute left-14 bottom-14 z-20 opacity-0">
         <button onClick={goMap} className="flex items-center gap-3 cursor-pointer">
-          <img src="/images/home/MapButton.png" alt="" className="h-12 w-12" />
-          <span className="text-[#75290E] text-xl font-semibold">Explore full map</span>
+          <img src="/images/home/MapButton.png" alt="" className="h-15 w-15" />
+          <span className="text-[#75290E] text-2xl font-semibold">Explore full map</span>
         </button>
       </div>
 
@@ -278,7 +278,7 @@ export default function HomeScreen() {
                 key={b.id}
                 ref={el => { if (el) sidebarItemsRef.current[i] = el; }}
                 onClick={() => goBuilding(b.id)}
-                className="w-full text-left text-xl px-3 py-2 rounded-md bg-white text-[#75290E] font-staatliches hover:bg-[#75290E] hover:text-white"
+                className="w-full text-center text-xl px-3 py-2 rounded-md bg-white text-[#75290E] font-staatliches hover:bg-[#75290E] hover:text-white"
               >
                 {b.name}
               </button>

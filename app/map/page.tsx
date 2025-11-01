@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useSoundEffect } from '@/hooks/useSoundEffect';
 import { tracks } from '@/data/buildings';
 import type { Pin } from '@/data/types';
+import { setHeapSnapshotNearHeapLimit } from 'v8';
 
 function useFlattenedPins() {
   return useMemo(() => {
@@ -36,6 +37,9 @@ export default function MapPage() {
 
   const [filter, setFilter] = useState<'all' | string>('all');
   const [selectedId, setSelectedId] = useState<string | undefined>(undefined);
+  const [showHint, setShowHint] = useState(true);
+  const [hintMounted, setHintMounted] = useState(true);
+  const hintRef = useRef<HTMLDivElement | null>(null);
 
   const filteredPins = useMemo<Pin[]>(() => {
     if (filter === 'all') return allPins;
@@ -83,6 +87,29 @@ export default function MapPage() {
     return () => { tl.kill(); }
   }, []);
 
+  useEffect(() => {
+    if(showHint) {
+      setHintMounted(true);
+      requestAnimationFrame(() => {
+        if(!hintRef.current) return;
+        gsap.fromTo(
+          hintRef.current,
+          {autoAlpha: 0, y: -6},
+          {autoAlpha: 1, y: 0, duration: 0.28, ease: 'power2.out'}
+        );
+      });
+    } else {
+      if(!hintRef.current) { setHintMounted(false); return; }
+      gsap.to(hintRef.current, {
+        autoAlpha: 0,
+        y: -6,
+        duration: 0.22,
+        ease: 'power2.inOut',
+        onComplete: () => setHintMounted(false),
+      });
+    }
+  }, [showHint, gsap]);
+
   const pill = (active: boolean) => [
     'w-full text-center px-4 py-2 rounded-md border text-xl font-staatliches tracking-wide',
     active ? 'bg-[#75290E] text-white border-transparent'
@@ -122,6 +149,20 @@ export default function MapPage() {
         </aside>
 
         <div className="absolute inset-0" style={{ right: '26%' }}>
+          {hintMounted && (
+            <div
+              ref={hintRef}
+              className="absolute inset-0 z-1000 pointer-events-none flex items-start justify-center"
+            >
+              <div className="mt-6">
+                <div className="bg-black/80 text-white rounded-lg px-4 py-3 shadow-lg">
+                  <p className="text-center text-base font-lexendDeca">
+                    Use a two-finger drag gesture to move around the map!
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
           <div className="absolute top-8 left-10 z-20">
             <img
               src="/images/home/TheHistoricBuildingsofDalhart_Logo.png"
@@ -142,6 +183,7 @@ export default function MapPage() {
             }}
             fitMode='width'
             onHome={() => { router.push('/'); }}
+            onUserPin={() => setShowHint(false)}
           />
         </div>
       </div>
