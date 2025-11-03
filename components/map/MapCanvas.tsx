@@ -295,7 +295,7 @@ export default function MapCanvas({
       )}
 
       {showControls && (
-        <div className="absolute bottom-5 left-5 z-[200] flex flex-col items-start gap-2">
+        <div className="absolute bottom-8 left-5 z-[200] flex flex-col items-start gap-2">
           <button onClick={() => { playClick(); zoomBy(1/1.2) }} className="cursor-pointer mx-auto" aria-label="Zoom out">
             <img src="/images/home/MinusButton.png" className="h-16 w-16" alt="" />
           </button>

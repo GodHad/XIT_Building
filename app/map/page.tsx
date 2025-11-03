@@ -94,17 +94,15 @@ export default function MapPage() {
         if(!hintRef.current) return;
         gsap.fromTo(
           hintRef.current,
-          {autoAlpha: 0, y: -6},
-          {autoAlpha: 1, y: 0, duration: 0.28, ease: 'power2.out'}
+          { autoAlpha: 0},
+          { autoAlpha: 1, duration: 0.30, ease: 'power2.out' }
         );
       });
     } else {
       if(!hintRef.current) { setHintMounted(false); return; }
       gsap.to(hintRef.current, {
         autoAlpha: 0,
-        y: -6,
-        duration: 0.22,
-        ease: 'power2.inOut',
+        duration: 0.22, ease: 'power2.inOut',
         onComplete: () => setHintMounted(false),
       });
     }
@@ -152,13 +150,21 @@ export default function MapPage() {
           {hintMounted && (
             <div
               ref={hintRef}
-              className="absolute inset-0 z-1000 pointer-events-none flex items-start justify-center"
+              className="absolute bottom-8 right-8 z-1000"
             >
-              <div className="mt-6">
-                <div className="bg-black/80 text-white rounded-lg px-4 py-3 shadow-lg">
-                  <p className="text-center text-base font-lexendDeca">
-                    Use a two-finger drag gesture to move around the map!
-                  </p>
+              <div
+                className="
+                  flex items-center gap-3 rounded-xl border border-black/50 shadow-[0_10px_28px_rgba(0,0,0,0.35)] px-5 py-3 text-white bg-[#75290E]"
+              >
+                <img
+                  src="/images/home/TwofingerDrag.png"
+                  alt=""
+                  className="h-9 w-9 shrink-0 select-none pointer-events-none"
+                  draggable={false}
+                />
+                <div className="leading-tight font-lexendDeca">
+                  <div>Two-finger drag</div>
+                  <div>to move the map</div>
                 </div>
               </div>
             </div>
