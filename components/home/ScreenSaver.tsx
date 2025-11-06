@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { useInactivityTimer } from '@/hooks/useInactivityTmer';
-import { ensureGsap } from "@/utils/gsapClient";
+import { ensureGsap } from '@/utils/gsapClient';
 import { useRouter } from 'next/navigation';
 
 const SLIDES = [
@@ -15,17 +15,21 @@ const FADE_MS = 1200;
 const PERIOD_MS = Math.max(1000, HOLD_MS - FADE_MS);
 
 export default function ScreenSaver() {
-  const { idle, reset } = useInactivityTimer(3 * 60 * 1000);
+  const { idle } = useInactivityTimer(3 * 60 * 1000);
   const gsap = ensureGsap();
   const router = useRouter();
 
-  const rootRef  = useRef<HTMLButtonElement | null>(null);
+  const rootRef = useRef<HTMLButtonElement | null>(null);
   const frontRef = useRef<HTMLImageElement | null>(null);
-  const backRef  = useRef<HTMLImageElement | null>(null);
+  const backRef = useRef<HTMLImageElement | null>(null);
   const timerRef = useRef<number | null>(null);
-  const tlRef    = useRef<gsap.core.Timeline | null>(null);
+  const tlRef = useRef<gsap.core.Timeline | null>(null);
 
+  const [animatingOut, setAnimatingOut] = useState(false);
   const [index, setIndex] = useState(0);
+  const navigatingRef = useRef(false);
+
+  useEffect(() => { try { router.prefetch('/'); } catch { } }, [router]);
 
   const preload = (src: string) =>
     new Promise<void>((resolve, reject) => {
@@ -43,91 +47,98 @@ export default function ScreenSaver() {
     }
 
     let mounted = true;
-
     const front = frontRef.current!;
-    const back  = backRef.current!;
+    const back = backRef.current!;
 
-    const init = async () => {
-      if (!mounted) return;
-
+    (async () => {
       const cur = index % SLIDES.length;
       const nxt = (index + 1) % SLIDES.length;
 
       front.src = SLIDES[cur];
-      back.src  = SLIDES[nxt];
+      back.src = SLIDES[nxt];
 
       await Promise.all([preload(SLIDES[cur]), preload(SLIDES[nxt])]);
       if (!mounted) return;
 
       gsap.set(front, { opacity: 1 });
-      gsap.set(back,  { opacity: 0 });
+      gsap.set(back, { opacity: 0 });
 
-      if (timerRef.current) { window.clearInterval(timerRef.current); }
+      if (timerRef.current) window.clearInterval(timerRef.current);
+
+      const prevIndexRef = { current: index };
+
       timerRef.current = window.setInterval(async () => {
         if (!mounted) return;
+
         const nextIndex = (prevIndexRef.current + 1) % SLIDES.length;
         const nextFront = nextIndex;
-        const nextBack  = (nextIndex + 1) % SLIDES.length;
+        const nextBack = (nextIndex + 1) % SLIDES.length;
 
         back.src = SLIDES[nextFront];
-        try {
-          await preload(SLIDES[nextFront]);
-        } catch {
-        }
-        if (!mounted) return;
+        try { await preload(SLIDES[nextFront]); } catch { }
 
         if (tlRef.current) tlRef.current.kill();
-        tlRef.current = gsap.timeline();
-        tlRef.current
+        tlRef.current = gsap.timeline()
           .to(front, { opacity: 0, duration: FADE_MS / 1000, ease: 'power2.out' }, 0)
-          .to(back,  { opacity: 1, duration: FADE_MS / 1000, ease: 'power2.out' }, 0)
+          .to(back, { opacity: 1, duration: FADE_MS / 1000, ease: 'power2.out' }, 0)
           .add(() => {
             front.src = back.src;
             gsap.set(front, { opacity: 1 });
-            gsap.set(back,  { opacity: 0 });
+            gsap.set(back, { opacity: 0 });
 
             const following = SLIDES[nextBack];
             back.src = following;
-            preload(following).catch(() => {});
+            preload(following).catch(() => { });
             prevIndexRef.current = nextIndex;
             setIndex(nextIndex);
           });
       }, PERIOD_MS) as unknown as number;
-    };
-
-    const prevIndexRef = { current: index };
-    init();
+    })();
 
     return () => {
       mounted = false;
       if (timerRef.current) { window.clearInterval(timerRef.current); timerRef.current = null; }
       if (tlRef.current) { tlRef.current.kill(); tlRef.current = null; }
     };
-  }, [idle, gsap]);
+  }, [idle, gsap, index]);
 
   const onDismiss = () => {
+    if (navigatingRef.current) return;
+    navigatingRef.current = true;
+
+    setAnimatingOut(true);
+
     if (timerRef.current) { window.clearInterval(timerRef.current); timerRef.current = null; }
-    if (tlRef.current)    { tlRef.current.kill(); tlRef.current = null; }
+    if (tlRef.current) { tlRef.current.kill(); tlRef.current = null; }
+
+    try { router.push('/'); } catch { }
+    window.setTimeout(() => {
+      if (window.location.pathname !== '/') window.location.assign('/');
+    }, 800);
 
     const el = rootRef.current;
-    if (!el) { router.push('/'); return; }
-
-    gsap.to(el, {
-      opacity: 0,
-      duration: 0.25,
-      ease: 'power1.out',
-      onComplete: () => router.push('/'),
-    });
+    if (el) {
+      gsap.to(el, { opacity: 0, duration: 0.25, ease: 'power1.out' });
+    }
   };
 
-  if (!idle) return null;
+  if (!idle && !animatingOut) return null;
 
   return (
     <button
       ref={rootRef}
-      onClick={onDismiss}
+      type="button"
+      className="fixed inset-0 bg-black z-[2147483647]"
+      onPointerDownCapture={onDismiss}
+      onTouchStartCapture={onDismiss}
+      onMouseDownCapture={onDismiss}
+      style={{
+        WebkitTapHighlightColor: 'transparent',
+        touchAction: 'none',
+        userSelect: 'none',
+        WebkitUserSelect: 'none',
+      }}
       aria-label="Dismiss screensaver"
-      className="fixed inset-0 z-[9999] bg-black"
     >
       <img
         ref={frontRef}
@@ -141,9 +152,10 @@ export default function ScreenSaver() {
         className="absolute inset-0 w-full h-full object-contain select-none pointer-events-none will-change-[opacity]"
         draggable={false}
       />
-
-      <div className="absolute inset-0 pointer-events-none"
-           style={{ background: 'radial-gradient(80% 80% at 50% 50%, transparent, rgba(0,0,0,.15))' }} />
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ background: 'radial-gradient(80% 80% at 50% 50%, transparent, rgba(0,0,0,.15))' }}
+      />
     </button>
   );
 }

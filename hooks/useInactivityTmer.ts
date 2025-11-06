@@ -18,7 +18,7 @@ export function useInactivityTimer(timeoutMs = 180000) {
   useEffect(() => {
     start();
     const ping = () => reset();
-    const events: (keyof WindowEventMap)[] = ['pointerdown','mousemove','keydown','wheel','touchstart'];
+    const events: (keyof WindowEventMap)[] = ['pointerdown','keydown','wheel','touchstart'];
     events.forEach(e => window.addEventListener(e, ping, { passive: true }));
     return () => {
       if (timerRef.current) window.clearTimeout(timerRef.current);
